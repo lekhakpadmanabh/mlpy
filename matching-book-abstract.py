@@ -17,7 +17,13 @@ def grab_input():
 
 titles,desc, N  = grab_input()
 
-tfidf = TfidfVectorizer(stop_words='english', analyzer='word', ngram_range=(1,3))
+english_stemmer = nltk.stem.SnowballStemmer('english')
+class StemmedTfidfVectorizer(TfidfVectorizer):
+    def build_analyzer(self):
+    analyzer = super(TfidfVectorizer, self).build_analyzer()
+    return lambda doc: (english_stemmer.stem(w) for w in analyzer(doc))
+tfidf = StemmedTfidfVectorizer(min_df=1, stop_words='english', analyzer='word', ngram_range=(1,3))
+
 dvec = tfidf.fit_transform(desc)
 
 def test(sample):
